@@ -2,6 +2,9 @@
 """
 Created on Wed Apr  8 21:34:59 2020
 
+Once the data from each pegasor is imported, this file can be run in order to 
+generate several plots to visualized the N concentrations. Each variable can be plotted
+by changing 'n' variable to that desired. 
 @author: D
 """
 # change to pycode directory
@@ -10,13 +13,13 @@ import numpy as np
 import pandas as pd
 import os, os.path
 import matplotlib.pyplot as m
-import csv
 import time
 import win32com.client as wincl
 import time
 from matplotlib import gridspec
 import seaborn as sns # for the KDE plot
 
+# change to folder where code is stored:
 os.chdir(r'C:\Users\D\OneDrive - purdue.edu\ABE\PIAQ Analysis\PyCode')
 # create function that tells you when tasks are done (audio + visual)
 def sayandprint(string):
@@ -26,13 +29,14 @@ def sayandprint(string):
     current_time = time.strftime("%H:%M:%S", t)
     print(string +" "+ current_time)
 
-# LOAD DATAFRAMES (if necessary) from saved HGF5 files
+# LOAD DATAFRAMES (if necessary) from saved HDF5 files
 store1 = pd.HDFStore('store1.h5')
 store2 = pd.HDFStore('store2.h5')
 store3 = pd.HDFStore('store3.h5')
 store4 = pd.HDFStore('store4.h5')
 
-# only want to work with a few variables so turn them into np.arrays & clear df's to save space
+# store1.keys() # to view variable possibilities
+# load relevant variables from HDF5 files as arrays (to save space)
 n1 = store1['sn1'].to_numpy()
 a1 = store1['sa1'].to_numpy()
 time1 = store1['stime1'].to_numpy()
@@ -50,10 +54,6 @@ time4 = store4['stime4'].to_numpy()
 fgr = m.figure(figsize =(11,8)) 
 fgr.add_axes()
 fgr.suptitle('PIAQ Number Concentration Time Series Plots')
-#ax1 = fgr.add_subplot(221)
-#ax2 = fgr.add_subplot(222)
-#ax3 = fgr.add_subplot(223)
-#ax4 = fgr.add_subplot(224)
 
 # %
 # PIAQ 1
@@ -89,7 +89,7 @@ fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.
 m.show()
 
 # %% Filter data:
-
+# Find indices in each data set where  0> N > 10^5 and remove
 idx_below = [idx_sub for idx_sub, val in enumerate(n1) if val < 0]
 idx_above = [idx_sup for idx_sup, val in enumerate(n1) if val > 10**5]
 n1=np.delete(n1,idx_below)
@@ -106,8 +106,6 @@ idx_below = [idx_sub for idx_sub, val in enumerate(n4) if val < 0]
 idx_above = [idx_sup for idx_sup, val in enumerate(n4) if val > 10**5]
 n4=np.delete(n4,idx_below)
 n4=np.delete(n4,idx_above)
-
-
 
 # %% BOXPLOTS: 
 # without outliers
@@ -135,6 +133,8 @@ ax4 = fgr.add_subplot(144)
 ax4=m.boxplot(n4,1,'')
 m.title('PIAQ 4: Pre-filter Supply')
 fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.1)
+
+m.show()
 # %% with outliers
 
 fgr = m.figure(figsize =(11,8)) 
@@ -160,7 +160,7 @@ ax4 = fgr.add_subplot(144)
 ax4=m.boxplot(n4)
 m.title('PIAQ 4: Pre-filter Supply')
 fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.1)
-
+m.show()
 # %% NORMALZIED CDFS
 
 fgr = m.figure(figsize =(11,8)) 
@@ -202,45 +202,6 @@ fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.
 
 m.show()
 
-# %% Surface Area
-fgr = m.figure(figsize =(11,8)) 
-fgr.add_axes()
-fgr.suptitle('PIAQ Surface Area Concentration Time Series Plots')
-
-# %
-# PIAQ 1
-ax1 = fgr.add_subplot(221)
-ax1 = m.plot(time1,a1,color='red')
-m.title('a.) PIAQ 1: Office Air')
-m.ylabel('A ($um^2/cm^3$)')
-m.xlabel('Time')
-
-# PIAQ 2
-ax2 = fgr.add_subplot(222)
-ax2 = m.plot(time2,a2,color='orange')
-m.title('b.) PIAQ 2: Outdoor Air')
-m.ylabel('A ($um^2/cm^3$)')
-m.xlabel('Time')
-
-# PIAQ 3
-ax3 = fgr.add_subplot(223)
-ax3 = m.plot(time3,a3,color='green')
-m.title('c.) PIAQ 3: Supply Air')
-m.ylabel('A ($um^2/cm^3$)')
-m.xlabel('Time')
-
-# PIAQ 4
-ax4 = fgr.add_subplot(224)
-ax4 = m.plot(cs4/cs4[-1],color='blue')
-m.title('d. PIAQ 4: Pre-filter Supply')
-m.ylabel('A ($um^2/cm^3$)')
-m.xlabel('Time')
-
-fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.1)
-
-m.show()
-
-
 # %% KDE PLOTS- look at distributions for each dataset
 fgr = m.figure(figsize =(11,8)) 
 fgr.add_axes()
@@ -277,11 +238,4 @@ m.title('d. PIAQ 4: Pre-filter Supply')
 fgr.subplots_adjust(wspace=0.4,hspace=0.4,left=0.125,right=0.9,top=0.8,bottom=0.1)
 
 m.show()
-# %% KDE ALSO TRY:
 
-
-
-
-# %% OTHER IDEAS: 
-# 1. find times when all of the data is the same- make table of dates when each dataset is present
-# 2. comparison plots between each
