@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Apr  8 21:34:59 2020
+Updated 4/17/20
 
 Once the data from each pegasor is imported, this file can be run in order to 
 generate several plots to visualized the N concentrations. Each variable can be plotted
 by changing 'n' variable to that desired. 
-@author: D
+@author: wagne216
 """
 # change to pycode directory
 
@@ -29,26 +29,26 @@ def sayandprint(string):
     current_time = time.strftime("%H:%M:%S", t)
     print(string +" "+ current_time)
 
-# LOAD DATAFRAMES (if necessary) from saved HDF5 files
-store1 = pd.HDFStore('store1.h5')
-store2 = pd.HDFStore('store2.h5')
-store3 = pd.HDFStore('store3.h5')
-store4 = pd.HDFStore('store4.h5')
-
-# store1.keys() # to view variable possibilities
-# load relevant variables from HDF5 files as arrays (to save space)
-n1 = store1['sn1'].to_numpy()
-a1 = store1['sa1'].to_numpy()
-time1 = store1['stime1'].to_numpy()
-n2 = store2['sn2'].to_numpy()
-a2 = store2['sa2'].to_numpy()
-time2 = store2['stime2'].to_numpy()
-n3 = store3['sn3'].to_numpy()
-a3 = store3['sA3'].to_numpy()
-time3 = store3['stime3'].to_numpy()
-n4 = store4['sn4'].to_numpy()
-a4 = store4['sa4'].to_numpy()
-time4 = store4['stime4'].to_numpy()
+## LOAD DATAFRAMES (if necessary) from saved HDF5 files
+#store1 = pd.HDFStore('store1.h5')
+#store2 = pd.HDFStore('store2.h5')
+#store3 = pd.HDFStore('store3.h5')
+#store4 = pd.HDFStore('store4.h5')
+#
+## store1.keys() # to view variable possibilities
+## load relevant variables from HDF5 files as arrays (to save space)
+#n1 = store1['sn1'].to_numpy()
+#a1 = store1['sa1'].to_numpy()
+#time1 = store1['stime1'].to_numpy()
+#n2 = store2['sn2'].to_numpy()
+#a2 = store2['sa2'].to_numpy()
+#time2 = store2['stime2'].to_numpy()
+#n3 = store3['sn3'].to_numpy()
+#a3 = store3['sA3'].to_numpy()
+#time3 = store3['stime3'].to_numpy()
+#n4 = store4['sn4'].to_numpy()
+#a4 = store4['sa4'].to_numpy()
+#time4 = store4['stime4'].to_numpy()
 
 # %% TIME-SERIES- check for data gaps and obvious wrong things that may need manually corrected
 fgr = m.figure(figsize =(11,8)) 
@@ -58,7 +58,7 @@ fgr.suptitle('PIAQ Number Concentration Time Series Plots')
 # %
 # PIAQ 1
 ax1 = fgr.add_subplot(221)
-ax1 = m.plot(time1,n1,color='red')
+ax1 = m.plot(time1b,n1b,color='red')
 m.title('a.) PIAQ 1')
 m.ylabel('N ($cm^{-3}$)')
 m.xlabel('Time')
@@ -87,25 +87,6 @@ m.xlabel('Time')
 fgr.subplots_adjust(wspace=0.4,hspace=0.3,left=0.125,right=0.9,top=0.9,bottom=0.1)
 
 m.show()
-
-# %% Filter data:
-# Find indices in each data set where  0> N > 10^5 and remove
-idx_below = [idx_sub for idx_sub, val in enumerate(n1) if val < 0]
-idx_above = [idx_sup for idx_sup, val in enumerate(n1) if val > 10**5]
-n1=np.delete(n1,idx_below)
-n1=np.delete(n1,idx_above)
-idx_below = [idx_sub for idx_sub, val in enumerate(n2) if val < 0]
-idx_above = [idx_sup for idx_sup, val in enumerate(n2) if val > 10**5]
-n2=np.delete(n2,idx_below)
-n2=np.delete(n2,idx_above)
-idx_below = [idx_sub for idx_sub, val in enumerate(n3) if val < 0]
-idx_above = [idx_sup for idx_sup, val in enumerate(n3) if val > 10**5]
-n3=np.delete(n3,idx_below)
-n3=np.delete(n3,idx_above)
-idx_below = [idx_sub for idx_sub, val in enumerate(n4) if val < 0]
-idx_above = [idx_sup for idx_sup, val in enumerate(n4) if val > 10**5]
-n4=np.delete(n4,idx_below)
-n4=np.delete(n4,idx_above)
 
 # %% BOXPLOTS: 
 # without outliers
